@@ -9,10 +9,10 @@ In a department, there was a new lab admin who had nothing to do, his name was S
 a. If a directory starts with “AtoZ_”, then that directory will be encoded.
 b. If you rename a directory to have a prefix “AtoZ_”, then the directory will be encoded.
 c. When encoded directory is renamed to not have encoded name, then the directory will be decoded 
-d. For every encoding of a directory (mkdir or rename) will be recorded in a log file. The format is : /home/[USER]/Downloads/[Directory Name] → /home/[USER]/Downloads/AtoZ_[Directory Name]
+d. For every encoding of a directory (mkdir or rename) will be recorded in a log file. The format is : /home/[USER]/Downloads/[Directory Name] → 			/home/[USER]/Downloads/AtoZ_[Directory Name]
 e. Encoding method is also applied to all other directories inside the encoded directory.(rekursif)
 
-## MEMBER 
+## Solution
 The functions used to encode and decode according to the question request are as follows:
 
 
