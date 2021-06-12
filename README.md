@@ -12,6 +12,10 @@ c. When encoded directory is renamed to not have encoded name, then the director
 d. For every encoding of a directory (mkdir or rename) will be recorded in a log file. The format is : /home/[USER]/Downloads/[Directory Name] → /home/[USER]/Downloads/AtoZ_[Directory Name]
 e. Encoding method is also applied to all other directories inside the encoded directory.(rekursif)
 
+## MEMBER 
+The functions used to encode and decode according to the question request are as follows:
+
+
 # NO 2
 Other than that, Sei proposed to create additional encryption methods to increase the security of their computer data . The following is the additional encryption method designed by Sei
 a. If a directory is created starting with “RX_[Nama]”, then that directory and its contents will be encoded with a rename according to problem 1 with an additional ROT13 algorithm (Atbash + ROT13).
