@@ -69,7 +69,7 @@ The above function runs along the filename by ignoring / and will stop when it m
 
 	void logging2(const char* old, char* new) {
 	FILE * logFile;
-	logFile = fopen("/home/zo/fs.log", "a");
+	logFile = fopen("/home/farahdq/fs.log", "a");
 	
 	fprintf(logFile, "%s -> %s\n", old, new);
     	fclose(logFile);
