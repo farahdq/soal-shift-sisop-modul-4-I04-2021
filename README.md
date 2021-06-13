@@ -15,6 +15,66 @@ e. Encoding method is also applied to all other directories inside the encoded d
 ## Solution
 The functions used to encode and decode according to the question request are as follows:
 
+	void encode1(char* strEnc1) { 
+	if(strcmp(strEnc1, ".") == 0 || strcmp(strEnc1, "..") == 0)
+        return;
+    
+    	int strLength = strlen(strEnc1);
+    	for(int i = 0; i < strLength; i++) {
+		if(strEnc1[i] == '/') 
+            		continue;
+		if(strEnc1[i]=='.')
+	            break;
+        
+		if(strEnc1[i]>='A'&&strEnc1[i]<='Z')
+	            strEnc1[i] = 'Z'+'A'-strEnc1[i];
+	        if(strEnc1[i]>='a'&&strEnc1[i]<='z')
+	            strEnc1[i] = 'z'+'a'-strEnc1[i];
+	}
+	}
+
+	void decode1(char * strDec1){ 
+	if(strcmp(strDec1, ".") == 0 || strcmp(strDec1, "..") == 0 || strstr(strDec1, "/") == NULL) 
+        return;
+    
+    	int strLength = strlen(strDec1), s=0;
+	for(int i = strLength; i >= 0; i--){
+		if(strDec1[i]=='/')break;
+
+		if(strDec1[i]=='.'){//nyari titik terakhir
+			strLength = i;
+			break;
+		}
+	}
+	for(int i = 0; i < strLength; i++){
+		if(strDec1[i]== '/'){
+			s = i+1;
+			break;
+		}
+	}
+   	for(int i = s; i < strLength; i++) {
+		if(strDec1[i] =='/'){
+   	         continue;
+   	     }
+   	     if(strDec1[i]>='A'&&strDec1[i]<='Z'){
+   	         strDec1[i] = 'Z'+'A'-strDec1[i];
+   	     }
+   	     if(strDec1[i]>='a'&&strDec1[i]<='z'){
+   	         strDec1[i] = 'z'+'a'-strDec1[i];
+   	     }
+   	 }	
+	}
+
+The above function runs along the filename by ignoring / and will stop when it meets with . where. before the extension. Additionally, it will be over-ended or decodeed. While the function for point d is to write logs are as follows:
+
+	void logging2(const char* old, char* new) {
+	FILE * logFile;
+	logFile = fopen("/home/zo/fs.log", "a");
+	
+	fprintf(logFile, "%s -> %s\n", old, new);
+    	fclose(logFile);
+	}
+The above function will be called when the folder starts AtoZ_ formed both when creating (mkdir) and when the rename folder becomes atoZ prefix. The function writes logs according to the format /home/[USER]/Downloads/[Directory Name] → /home/[USER]/Downloads/AtoZ_[Directory Name], if the log file does not already exist in the directory, a new log file will be created to write it to the file. After writing on the file, do not forget to diclose back.
 
 # NO 2
 Other than that, Sei proposed to create additional encryption methods to increase the security of their computer data . The following is the additional encryption method designed by Sei
@@ -51,6 +111,70 @@ e. The format for logging is:
 Level : Level logging, dd : 2 digit date, mm : 2 digit month, yyyy : 4 digit year, HH : 2 digit hour (24 Hour format),MM : 2 digit minute, SS : 2 digit second, CMD : Called System Call, DESC : additional information and parameters
 INFO::28052021-10:00:00:CREATE::/test.txt
 INFO::28052021-10:01:00:RENAME::/test.txt::/rename.txt
+
+## Solution
+The functions for logging are as follows: 
+
+	void logging(char* c, int type){
+	time_t currTime;
+	struct tm * timeinfo;
+	time ( &currTime );
+	timeinfo = localtime (&currTime);
+	
+	FILE * logFile;
+	logFile = fopen("/home/zo/SinSeiFS.log", "a");
+		
+    	if(type==1){//info
+        	fprintf(logFile, "INFO::%d%d%d-%d:%d:%d:%s\n", timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, c);
+    	}
+    	else if(type==2){ //warning
+        	fprintf(logFile, "WARNING::%d%d%d-%d:%d:%d:%s\n", timeinfo->tm_mday, timeinfo->tm_mon + 1, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, c);
+    	}
+    	fclose(logFile);
+}
+
+The above functions will be called on mkdir, mknode, unlink, rmdir, rename, and write functions. The function will write info / warning, timestamp when the operation is performed, along with the description. For warning will be used when unlink and rmdir, while the other is info. Here's an example of calling the rmdir and rename functions.
+
+	static int xmp_rmdir(const char *path) {
+	char * strToEnc1 = strstr(path, prefix);
+	if(strToEnc1 != NULL){
+        	decode1(strToEnc1); 
+    	}
+	
+	char newPath[1000];
+	sprintf(newPath, "%s%s",directoryPath,path);
+    	char str[100];
+	sprintf(str, "REMOVE::%s", path);
+	logging(str,2);
+	int result;
+	result = rmdir(newPath);
+	if (result == -1)
+		return -errno;
+
+	return 0;
+	}
+
+	static int xmp_rename(const char *source, const char *dest) { 
+	char fileSource[1000], fileDest[1000];
+	sprintf(fileSource, "%s%s", directoryPath, source);
+	sprintf(fileDest, "%s%s", directoryPath, dest);
+
+    	char str[100];
+	sprintf(str, "RENAME::%s::%s", source, dest);
+	logging(str,1);
+	
+	char * folderPath = strstr(fileDest, prefix);
+	if(folderPath != NULL) {
+		logging2(fileSource, fileDest);
+	}
+	int result;
+	result = rename(fileSource, fileDest);
+	if (result == -1)
+		return -errno;
+
+	return 0;
+	}
+
 
 
 
